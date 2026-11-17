@@ -85,12 +85,11 @@ export function stageShot(name, world) {
     return { screen: SCREEN_TITLE, best: 0 };
   }
   const limit = name === 'end' ? END_SECONDS : name === 'monolith' ? MONOLITH_SECONDS : PLAY_SECONDS;
-  const skill = name === 'end' ? 0 : 1;
   let monolithSeenAt = -1;
   for (let i = 0; i < limit / STEP; i += 1) {
     const seconds = i * STEP;
     // The end pilot plays well for the first stretch, then gives up.
-    const activeSkill = name === 'end' && seconds > 18 ? 0 : skill;
+    const activeSkill = name === 'end' && seconds > 18 ? 0 : 1;
     const input = activeSkill === 0
       ? { move: { x: 0, y: 0 }, aim: { x: 640, y: 300 }, firing: false, dash: false }
       : autopilot(world.state, activeSkill);
