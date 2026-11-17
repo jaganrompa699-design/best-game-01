@@ -12,7 +12,7 @@ export function createAudio() {
       if (!AC) return null;
       context = new AC();
       master = context.createGain();
-      master.gain.value = 0.16;
+      master.gain.value = 0.15;
       master.connect(context.destination);
     } catch {
       context = null;

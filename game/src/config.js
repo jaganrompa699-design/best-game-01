@@ -15,7 +15,7 @@ export const PLAYER = {
   boltRadius: 5,
   dashSpeed: 920,
   dashTime: 0.16,
-  dashCooldown: 1.6,
+  dashCooldown: 1.4,
   invulnerableAfterHit: 1.5,
 };
 

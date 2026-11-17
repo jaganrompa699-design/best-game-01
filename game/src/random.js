@@ -19,6 +19,14 @@ export function createRandom(seed) {
     pick(list) {
       return list[Math.floor(this.next() * list.length)];
     },
+    shuffle(list) {
+      const copy = list.slice();
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(this.next() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    },
     angle() {
       return this.next() * Math.PI * 2;
     },

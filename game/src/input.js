@@ -96,7 +96,7 @@ export function createInput(canvas) {
       return found;
     },
     dashPressed() {
-      return keys.has(' ') && !keys.has('Enter');
+      return keys.has(' ') || keys.has('Shift');
     },
   };
 }

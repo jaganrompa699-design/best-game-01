@@ -9,7 +9,7 @@ import { SCREEN_OVER, SCREEN_PLAY, SCREEN_TITLE } from './render.js';
 
 const SAMPLE = 1 / 30;
 const START_SECONDS = 4;
-const PLAY_SECONDS = 34;
+const PLAY_SECONDS = 90;
 const MONOLITH_SECONDS = 150;
 const END_SECONDS = 240;
 
@@ -72,8 +72,11 @@ function autopilot(state, skill) {
 
 /**
  * Set `world` to the named scene and return the screen to draw over it and the
- * best score to show. The play scene's pilot plays well; the end scene's pilot
- * never fires and never moves, so the shards catch it as a careless player is.
+ * best score to show. The play scene's pilot plays well and the capture waits
+ * for a busy frame (mid-wave, enemies on screen, bolts in flight); the monolith
+ * scene waits a few seconds after the monolith appears so it has moved in from
+ * the edge; the end scene's pilot plays for a while, then stops dodging and
+ * firing, so it dies with a real score on the board, as a careless player is.
  */
 export function stageShot(name, world) {
   world.start();
@@ -83,14 +86,25 @@ export function stageShot(name, world) {
   }
   const limit = name === 'end' ? END_SECONDS : name === 'monolith' ? MONOLITH_SECONDS : PLAY_SECONDS;
   const skill = name === 'end' ? 0 : 1;
+  let monolithSeenAt = -1;
   for (let i = 0; i < limit / STEP; i += 1) {
-    const input = skill === 0
+    const seconds = i * STEP;
+    // The end pilot plays well for the first stretch, then gives up.
+    const activeSkill = name === 'end' && seconds > 18 ? 0 : skill;
+    const input = activeSkill === 0
       ? { move: { x: 0, y: 0 }, aim: { x: 640, y: 300 }, firing: false, dash: false }
-      : autopilot(world.state, skill);
+      : autopilot(world.state, activeSkill);
     const events = world.step(STEP, input.move, input.aim, input.firing, input.dash);
     if (events & EVENT_OVER) break;
-    // The monolith scene stops once the monolith has shown up on screen.
-    if (name === 'monolith' && world.state.enemies.some((e) => e.kind === 'monolith')) break;
+    if (name === 'play') {
+      const s = world.state;
+      if (s.wave >= 3 && s.waveState === 'fighting' && s.enemies.length >= 5 && s.bolts.length >= 1) break;
+    }
+    if (name === 'monolith') {
+      const hasMonolith = world.state.enemies.some((e) => e.kind === 'monolith');
+      if (hasMonolith && monolithSeenAt < 0) monolithSeenAt = seconds;
+      if (monolithSeenAt >= 0 && seconds - monolithSeenAt >= 3) break;
+    }
   }
   const over = world.state.lives === 0;
   return { screen: over ? SCREEN_OVER : SCREEN_PLAY, best: world.state.score };

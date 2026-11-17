@@ -128,7 +128,7 @@ export function createWorld(random) {
   }
 
   function dropCore(x, y, guaranteed) {
-    if (!guaranteed && random.next() > 0.6) return;
+    if (!guaranteed && random.next() > 0.65) return;
     const angle = random.angle();
     const speed = random.range(40, 130);
     state.cores.push({

@@ -8,7 +8,7 @@
 // window.__shotReady for a screenshot.
 import { BEST_KEY, LIVES, STEP } from './config.js';
 import { createRandom } from './random.js';
-import { createWorld, EVENT_HIT, EVENT_OVER, EVENT_WAVE } from './world.js';
+import { createWorld, EVENT_HIT, EVENT_OVER } from './world.js';
 import { ACTION_CONFIRM, ACTION_MUTE, ACTION_PAUSE, createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createRenderer, SCREEN_OVER, SCREEN_PAUSED, SCREEN_PLAY, SCREEN_TITLE } from './render.js';
@@ -46,6 +46,16 @@ function saveBest(value) {
 
 function runShot(name) {
   const scene = stageShot(name, world);
+  // A read-only snapshot for the screenshot driver to check the staged scene.
+  window.__pulseState = {
+    screen: scene.screen,
+    score: world.state.score,
+    wave: world.state.wave,
+    lives: world.state.lives,
+    enemies: world.state.enemies.length,
+    cores: world.state.cores.length,
+    bolts: world.state.bolts.length,
+  };
   let painted = 0;
   function paint() {
     renderer.draw(world.state, scene.screen, scene.best);
@@ -63,9 +73,6 @@ function runGame() {
   let best = readBest();
   let accumulator = 0;
   let last = performance.now();
-  let clock = 0;
-  // Last-seen counters, so sounds fire on changes, not every frame.
-  let seen = { lives: LIVES, kills: 0, cores: 0, wave: 0, score: 0 };
 
   // Screen readers (and anyone watching the page's text) hear the screen changes.
   function announce(message) {
@@ -82,7 +89,6 @@ function runGame() {
     unlockAudioOnce();
     world.start();
     world.setBest(best);
-    seen = { lives: LIVES, kills: 0, cores: 0, wave: 0, score: 0 };
     accumulator = 0;
     screen = SCREEN_PLAY;
     audio.start();
@@ -102,7 +108,6 @@ function runGame() {
   function frame(now) {
     const elapsed = Math.min(MAX_FRAME, (now - last) / 1000);
     last = now;
-    clock += elapsed;
     const actions = input.takeActions();
     if (actions.has(ACTION_MUTE)) {
       const muted = audio.toggleMute();

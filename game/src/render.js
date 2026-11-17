@@ -35,7 +35,7 @@ function drawGlow(ctx, x, y, radius, color, alpha) {
 export function createRenderer(canvas) {
   const ctx = canvas.getContext('2d');
   const stars = [];
-  for (let i = 0; i < 110; i += 1) {
+  for (let i = 0; i < 130; i += 1) {
     stars.push({
       x: ((i * 373) % FIELD.width) / 1,
       y: ((i * 911) % FIELD.height) / 1,
@@ -95,7 +95,7 @@ export function createRenderer(canvas) {
       ctx.strokeStyle = 'rgba(125,249,255,0.5)';
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(player.x, player.y, PLAYER.radius + 7, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - player.dashCooldown / 1.6));
+      ctx.arc(player.x, player.y, PLAYER.radius + 7, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - player.dashCooldown / PLAYER.dashCooldown));
       ctx.stroke();
     }
   }
@@ -247,7 +247,7 @@ export function createRenderer(canvas) {
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(FIELD.width - 198, FIELD.height - 34, 180, 14);
     ctx.fillStyle = dashReady ? '#7df9ff' : '#3a4a7a';
-    ctx.fillRect(FIELD.width - 198, FIELD.height - 34, 180 * (dashReady ? 1 : 1 - state.player.dashCooldown / 1.6), 14);
+    ctx.fillRect(FIELD.width - 198, FIELD.height - 34, 180 * (dashReady ? 1 : 1 - state.player.dashCooldown / PLAYER.dashCooldown), 14);
     ctx.fillStyle = COLORS.text;
     ctx.font = 'bold 16px system-ui, sans-serif';
     ctx.textAlign = 'right';
