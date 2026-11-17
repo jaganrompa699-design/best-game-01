@@ -151,6 +151,16 @@ function runGame() {
       if (actions.has(ACTION_CONFIRM)) startGame();
     }
     renderer.draw(world.state, screen, best);
+    // A read-only snapshot for live play-testing and debugging.
+    window.__pulseState = {
+      screen,
+      score: world.state.score,
+      wave: world.state.wave,
+      lives: world.state.lives,
+      enemies: world.state.enemies.length,
+      cores: world.state.cores.length,
+      bolts: world.state.bolts.length,
+    };
     requestAnimationFrame(frame);
   }
 
